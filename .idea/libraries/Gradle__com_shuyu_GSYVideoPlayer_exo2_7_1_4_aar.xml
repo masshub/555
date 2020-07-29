@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="Gradle: com.shuyu:GSYVideoPlayer-exo2:7.1.4@aar">
+    <CLASSES>
+      <root url="file://D:/AndroidGradle/caches/transforms-2/files-2.1/c9cdfb91d983ba7a9cc2151951eab5fb/GSYVideoPlayer-exo2-7.1.4/AndroidManifest.xml" />
+      <root url="jar://D:/AndroidGradle/caches/transforms-2/files-2.1/c9cdfb91d983ba7a9cc2151951eab5fb/GSYVideoPlayer-exo2-7.1.4/jars/classes.jar!/" />
+      <root url="file://D:/AndroidGradle/caches/transforms-2/files-2.1/c9cdfb91d983ba7a9cc2151951eab5fb/GSYVideoPlayer-exo2-7.1.4/res" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://D:/AndroidGradle/caches/modules-2/files-2.1/com.shuyu/GSYVideoPlayer-exo2/7.1.4/ba0121f5540c0beffde7060547cc98d4cbaf1197/GSYVideoPlayer-exo2-7.1.4-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://D:/AndroidGradle/caches/modules-2/files-2.1/com.shuyu/GSYVideoPlayer-exo2/7.1.4/7a42a8d04a2f3082774ad74eabd86902639758c7/GSYVideoPlayer-exo2-7.1.4-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
