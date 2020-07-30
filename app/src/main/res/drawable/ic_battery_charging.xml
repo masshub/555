@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:drawable="@drawable/ic_battery_charging_20_white_48dp"
+        android:duration="300" />
+    <item
+        android:drawable="@drawable/ic_battery_charging_30_white_48dp"
+        android:duration="300" />
+    <item
+        android:drawable="@drawable/ic_battery_charging_90_white_48dp"
+        android:duration="300" />
+    <item
+        android:drawable="@drawable/ic_battery_charging_full_white_48dp"
+        android:duration="300" />
+
+</animation-list>
