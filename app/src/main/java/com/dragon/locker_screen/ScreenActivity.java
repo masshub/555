@@ -21,10 +21,13 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.dragon.locker_screen.adapter.ScreenAdapter;
+import com.dragon.locker_screen.channel.BasicMessageChannelPlugin;
 import com.dragon.locker_screen.utils.DateUtil;
 import com.dragon.locker_screen.utils.PermissionUtils;
 import com.dragon.locker_screen.utils.PowerUtil;
@@ -33,15 +36,25 @@ import com.shuyu.gsyvideoplayer.GSYVideoManager;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+
+import io.flutter.embedding.android.FlutterActivity;
+import io.flutter.embedding.engine.FlutterEngine;
+import io.flutter.plugin.common.BasicMessageChannel;
+import io.flutter.plugin.common.BinaryMessenger;
+import io.flutter.plugin.common.StandardMessageCodec;
+import io.flutter.plugins.GeneratedPluginRegistrant;
+
 
 /**
  * Created by Maker on 2020/7/28.
  * Description:
  */
-public class ScreenActivity extends Activity {
+public class ScreenActivity extends FlutterActivity {
     private PowerManager.WakeLock mWakeLock;
     private KeyguardManager mKeyguardManager;
     private KeyguardManager.KeyguardLock mKeyguardLock;
@@ -58,6 +71,11 @@ public class ScreenActivity extends Activity {
     private SimpleDateFormat weekFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
     private SimpleDateFormat monthFormat = new SimpleDateFormat("yyyy年MM月dd日", Locale.getDefault());
     protected UIChangingReceiver mUIChangingReceiver;
+
+    private  BasicMessageChannel<Object> channel;
+    private List<String> urls = new ArrayList<>();
+    private ScreenAdapter mAdapter;
+
 
 
     public void registerLockerReceiver() {
@@ -102,12 +120,30 @@ public class ScreenActivity extends Activity {
         }
     }
 
+    @Override
+    public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
+        super.configureFlutterEngine(flutterEngine);
+        GeneratedPluginRegistrant.registerWith(flutterEngine);
+        channel = new BasicMessageChannel<Object>(flutterEngine.getDartExecutor().getBinaryMessenger(), "BasicMessageChannelPlugin", StandardMessageCodec.INSTANCE);
+        channel.setMessageHandler(new BasicMessageChannel.MessageHandler<Object>() {
+            @Override
+            public void onMessage(@Nullable Object message, @NonNull BasicMessageChannel.Reply<Object> reply) {
+                Map<Object,Object> data = (Map<Object, Object>) message;
+                Log.d("ChannelLog",data.get("data").toString());
+                reply.reply("android收到flutter的消息");
+                urls.addAll((Collection<? extends String>) data.get("data"));
+                mAdapter.notifyDataSetChanged();
+
+            }
+        });
+    }
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED //锁屏显示
                 | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD //解锁
                 | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON //保持屏幕不息屏
@@ -120,12 +156,13 @@ public class ScreenActivity extends Activity {
         initView();
 
         initData();
+
     }
 
 
 
+
     private void initData() {
-        List<String> urls = new ArrayList<>();
         urls.add("http://9890.vod.myqcloud.com/9890_4e292f9a3dd011e6b4078980237cc3d3.f20.mp4");
         urls.add("http://9890.vod.myqcloud.com/9890_4e292f9a3dd011e6b4078980237cc3d3.f20.mp4");
         urls.add("http://9890.vod.myqcloud.com/9890_4e292f9a3dd011e6b4078980237cc3d3.f20.mp4");
@@ -137,16 +174,15 @@ public class ScreenActivity extends Activity {
         urls.add("http://9890.vod.myqcloud.com/9890_4e292f9a3dd011e6b4078980237cc3d3.f20.mp4");
         urls.add("http://9890.vod.myqcloud.com/9890_4e292f9a3dd011e6b4078980237cc3d3.f20.mp4");
 
-
-        ScreenAdapter recyclerNormalAdapter = new ScreenAdapter(this, urls);
+        mAdapter = new ScreenAdapter(this, urls);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
         mRvScreen.setLayoutManager(linearLayoutManager);
-        mRvScreen.setAdapter(recyclerNormalAdapter);
+        mRvScreen.setAdapter(mAdapter);
 
 
         mRvScreen.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
-            int firstVisibleItem, lastVisibleItem;
+            int firstVisibleItem, lastVisibleItem,firstCompletelyVisibleItem,lastCompletelyVisibleItem;
 
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -158,6 +194,8 @@ public class ScreenActivity extends Activity {
                 super.onScrolled(recyclerView, dx, dy);
                 firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
                 lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+                firstCompletelyVisibleItem = linearLayoutManager.findFirstCompletelyVisibleItemPosition();
+                lastCompletelyVisibleItem = linearLayoutManager.findLastCompletelyVisibleItemPosition();
                 //大于0说明有播放
                 if (GSYVideoManager.instance().getPlayPosition() >= 0) {
                     //当前播放的位置
@@ -169,9 +207,16 @@ public class ScreenActivity extends Activity {
                         //是否全屏
                         if (!GSYVideoManager.isFullState(ScreenActivity.this)) {
                             GSYVideoManager.releaseAllVideos();
-                            recyclerNormalAdapter.notifyItemChanged(position);
+                            mAdapter.notifyItemChanged(position);
                         }
                     }
+                }
+                if(lastVisibleItem % 5 == 0){
+                    if(channel != null){
+                        channel.send("android向flutter请求10条数据");
+                        Log.d("ChannelLog","android向flutter请求10条数据");
+                    }
+
                 }
             }
         });
