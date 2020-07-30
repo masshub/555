@@ -18,21 +18,22 @@ public class MainActivity extends FlutterActivity {
     private Context mContext;
     static String TAG = "TAG";
 
+
     BroadcastReceiver mMasterResetReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             try {
                 Log.e("Output:", "接收到消息");
                 String action = intent.getAction();
-                disableSystemLockScreen(context);
-                Log.e(TAG, "Intent.ACTION_SCREEN_OFF");
-                Intent lockscreenIntent = new Intent();
-                lockscreenIntent.setAction("com.android.lockscreen");
-                lockscreenIntent.setPackage("com.dragon.locker_screen");
-                lockscreenIntent.putExtra("INTENT_ACTION", action);
-                lockscreenIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                lockscreenIntent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+//                disableSystemLockScreen(context);
+                Log.e(TAG, action);
+                Intent lockeanIntent = new Intent();
+                lockeanIntent.setAction("com.android.lockscreen");
+                lockeanIntent.setPackage("com.dragon.locker_screen");
+                lockeanIntent.putExtra("INTENT_ACTION", action);
+                lockeanIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                lockeanIntent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
 
-                mContext.startActivity(lockscreenIntent);
+                mContext.startActivity(lockeanIntent);
 
 //				startScreenActivity();
 
@@ -61,9 +62,12 @@ public class MainActivity extends FlutterActivity {
         ActivityCompat.checkSelfPermission(this,Manifest.permission.READ_EXTERNAL_STORAGE);
         ActivityCompat.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
+//        PermissionUtils.hasPermission()
+//        ActivityCompat.checkSelfPermission(this,Manifest.permission.DISABLE_KEYGUARD);
+
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET,
                 Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.DISABLE_KEYGUARD}, 0);
 
     }
 

@@ -3,6 +3,8 @@ package com.dragon.locker_screen;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.KeyguardManager;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -23,6 +25,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -48,6 +51,8 @@ import io.flutter.plugin.common.BasicMessageChannel;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.StandardMessageCodec;
 import io.flutter.plugins.GeneratedPluginRegistrant;
+
+import static com.google.android.exoplayer2.offline.DownloadService.startForeground;
 
 
 /**
@@ -156,6 +161,29 @@ public class ScreenActivity extends FlutterActivity {
         initView();
 
         initData();
+
+
+        Intent fullScreenIntent = new Intent(this, ScreenActivity.class);
+        PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(this, 0,
+                fullScreenIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(this, "jfidjf")
+                        .setSmallIcon(R.drawable.video_back)
+                        .setContentTitle("Incoming call")
+                        .setContentText("(919) 555-1234")
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setCategory(NotificationCompat.CATEGORY_CALL)
+
+                        // Use a full-screen intent only for the highest-priority alerts where you
+                        // have an associated activity that you would like to launch after the user
+                        // interacts with the notification. Also, if your app targets Android 10
+                        // or higher, you need to request the USE_FULL_SCREEN_INTENT permission in
+                        // order for the platform to invoke this notification.
+                        .setFullScreenIntent(fullScreenPendingIntent, true);
+
+        Notification incomingCallNotification = notificationBuilder.build();
+
 
     }
 
